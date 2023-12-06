@@ -10,8 +10,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.piiv.piiv.dto.CarRegistroDto;
+import com.piiv.piiv.dto.CarResponseDto;
 import com.piiv.piiv.entities.Car;
+import com.piiv.piiv.entities.Usuario;
 import com.piiv.piiv.repository.CarRepository;
+import com.piiv.piiv.repository.UsuarioRepository;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -20,19 +23,37 @@ public class CarController {
 
     @Autowired
     CarRepository carRepository;
+    @Autowired
+    UsuarioRepository usuarioRepository;
 
     @GetMapping("/cars")
-    public ResponseEntity<List<Car>> getAllCars() {
+    public ResponseEntity<List<CarResponseDto>> getAllCars() {
         try {
-            List<Car> cars = new ArrayList<Car>();
-
-            carRepository.findAll().forEach(cars::add);
+            List<Car> cars = carRepository.findAll();
 
             if (cars.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
 
-            return new ResponseEntity<>(cars, HttpStatus.OK);
+            List<CarResponseDto> carDto = new ArrayList<>();
+
+            cars.forEach(car->{
+            	CarResponseDto carTemp = new CarResponseDto();
+            	if(car.getInteressado() != null) {
+                	Usuario userDTO = usuarioRepository.findById(car.getInteressado()).get();
+                	carTemp.setInteressado(userDTO);
+            	}
+            	carTemp.setFoto(car.getFoto());
+            	carTemp.setAnoDeFabricacao(car.getAnoDeFabricacao());
+            	carTemp.setAnoDoModelo(car.getAnoDoModelo());
+            	carTemp.setDescricao(car.getDescricao());
+            	carTemp.setId(car.getId());
+            	carTemp.setMarca(car.getMarca());
+            	carTemp.setModelo(car.getModelo());
+            	carTemp.setValor(car.getValor());
+            	carDto.add(carTemp);
+            });
+            return new ResponseEntity<>(carDto, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -49,13 +70,27 @@ public class CarController {
         }
     }
 
+    @PutMapping("/cars/{id}/interesse/{userId}")
+    public ResponseEntity<Car> updateInteresse(@PathVariable("id") Long id, @PathVariable("userId") Integer interessado) {
+    	try {
+    		Car carro = carRepository.findById(id).get();
+    		carro.setInteressado(interessado);
+	        return new ResponseEntity<>(carRepository.save(carro), HttpStatus.CREATED);
+    	} catch (Exception e) {
+	    	System.out.println("error: "+e.getMessage());
+	        return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+	    }
+    }
+    
     @PostMapping("/cars")
-    public ResponseEntity<Car> createCar(@RequestBody CarRegistroDto car) {
+    public ResponseEntity<Car> createCar(@RequestBody Car car) {
         try {
         	Car carro = new Car();
-        	carro.setAnoDeFabricacao(car.getAnoFabricacao());
+        	carro.setFoto(car.getFoto());
+        	carro.setDescricao(car.getDescricao());
+        	carro.setAnoDeFabricacao(car.getAnoDeFabricacao());
         	carro.setMarca(car.getMarca());
-        	carro.setAnoDoModelo(car.getAnoModelo());
+        	carro.setAnoDoModelo(car.getAnoDoModelo());
         	carro.setModelo(car.getModelo());
         	carro.setValor(car.getValor());
 

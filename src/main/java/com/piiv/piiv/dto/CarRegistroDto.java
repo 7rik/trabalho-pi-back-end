@@ -16,8 +16,17 @@ public class CarRegistroDto {
 	private Integer anoFabricacao;
 	private Integer anoModelo;
 	private Double valor;
+
+    private byte[] foto;
 	
+    
 	
+	public byte[] getFoto() {
+		return foto;
+	}
+	public void setFoto(byte[] foto) {
+		this.foto = foto;
+	}
 	public Integer getId() {
 		return id;
 	}

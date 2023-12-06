@@ -22,8 +22,11 @@ public class Car {
     @Column(name = "modelo", length = 50)
     private String modelo;
 
-    @Column(name = "descricao")
+    @Column(name = "descricao", length = 500)
     private String descricao;
+
+    @Column(name = "foto")
+    private byte[] foto;
 
     @Column(name = "anoDeFabricacao")
     private int anoDeFabricacao;
@@ -67,6 +70,15 @@ public class Car {
 
 	public void setDescricao(String descricao) {
 		this.descricao = descricao;
+	}
+
+	
+	public byte[] getFoto() {
+		return foto;
+	}
+
+	public void setFoto(byte[] foto) {
+		this.foto = foto;
 	}
 
 	public int getAnoDeFabricacao() {
