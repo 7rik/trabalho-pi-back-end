@@ -16,6 +16,8 @@ import com.piiv.piiv.entities.Usuario;
 import com.piiv.piiv.repository.CarRepository;
 import com.piiv.piiv.repository.UsuarioRepository;
 
+import lombok.var;
+
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api")
@@ -26,37 +28,24 @@ public class CarController {
     @Autowired
     UsuarioRepository usuarioRepository;
 
+    @GetMapping("/public/cars")
+    public ResponseEntity<List<Car>> getAllCarsPublic() {
+    	try {
+    		List<Car> cars = carRepository.findByInteressadoNull();
+    		return new ResponseEntity<>(cars, HttpStatus.OK);
+    	}catch(Exception e) {
+          return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+    	}
+    }
+
     @GetMapping("/cars")
-    public ResponseEntity<List<CarResponseDto>> getAllCars() {
-        try {
-            List<Car> cars = carRepository.findAll();
-
-            if (cars.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-            }
-
-            List<CarResponseDto> carDto = new ArrayList<>();
-
-            cars.forEach(car->{
-            	CarResponseDto carTemp = new CarResponseDto();
-            	if(car.getInteressado() != null) {
-                	Usuario userDTO = usuarioRepository.findById(car.getInteressado()).get();
-                	carTemp.setInteressado(userDTO);
-            	}
-            	carTemp.setFoto(car.getFoto());
-            	carTemp.setAnoDeFabricacao(car.getAnoDeFabricacao());
-            	carTemp.setAnoDoModelo(car.getAnoDoModelo());
-            	carTemp.setDescricao(car.getDescricao());
-            	carTemp.setId(car.getId());
-            	carTemp.setMarca(car.getMarca());
-            	carTemp.setModelo(car.getModelo());
-            	carTemp.setValor(car.getValor());
-            	carDto.add(carTemp);
-            });
-            return new ResponseEntity<>(carDto, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<List<Car>> getAllCars() {
+    	try {
+    		List<Car> cars = carRepository.findAll();
+    		return new ResponseEntity<>(cars, HttpStatus.OK);
+    	}catch(Exception e) {
+          return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+    	}
     }
 
     @GetMapping("/cars/{id}")
@@ -70,14 +59,43 @@ public class CarController {
         }
     }
 
+    @GetMapping("/cars/interesse")
+    public ResponseEntity<List<Car>> getAllCarsInterested() {
+    	try {
+    		List<Car> cars = carRepository.findByInteressadoNotNull();
+
+    		cars.forEach(car->{
+    			Usuario userDTO = usuarioRepository.findById(car.getInteressado()).get();
+            	
+    		
+    		});
+
+    		return new ResponseEntity<>(cars, HttpStatus.OK);
+    	}catch(Exception e) {
+          return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+    	}
+    }
+
     @PutMapping("/cars/{id}/interesse/{userId}")
     public ResponseEntity<Car> updateInteresse(@PathVariable("id") Long id, @PathVariable("userId") Integer interessado) {
     	try {
     		Car carro = carRepository.findById(id).get();
+    		if(carro == null) {
+    			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+    		}
+
     		carro.setInteressado(interessado);
+    		List<Integer> historico = new ArrayList<>(); 
+    		if(carro.getHistoricoInteressado() == null || carro.getHistoricoInteressado().isEmpty()) {
+    			historico.add(interessado);
+    			carro.setHistoricoInteressado(historico);
+    		}else {
+    			historico = carro.getHistoricoInteressado();
+    			carro.setHistoricoInteressado(historico);
+    		}
 	        return new ResponseEntity<>(carRepository.save(carro), HttpStatus.CREATED);
     	} catch (Exception e) {
-	    	System.out.println("error: "+e.getMessage());
+	    	System.out.println("error: "+ e.getMessage());
 	        return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 	    }
     }
@@ -115,6 +133,7 @@ public class CarController {
             _car.setAnoDoModelo(car.getAnoDoModelo());
             _car.setValor(car.getValor());
             _car.setInteressado(car.getInteressado());
+            _car.setHistoricoInteressado(car.getHistoricoInteressado());
             return new ResponseEntity<>(carRepository.save(_car), HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

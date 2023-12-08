@@ -1,5 +1,7 @@
 package com.piiv.piiv.dto;
 
+import java.util.List;
+
 import com.piiv.piiv.entities.Usuario;
 
 import lombok.AllArgsConstructor;
@@ -17,15 +19,23 @@ public class CarResponseDto {
     private int anoDeFabricacao;
     private int anoDoModelo;
     private double valor;
-    private byte[] foto;
+    private String foto;
     private Usuario interessado;
+    private List<Integer> historicoInteressado;
     
     
     
-	public byte[] getFoto() {
+    
+	public List<Integer> getHistoricoInteressado() {
+		return historicoInteressado;
+	}
+	public void setHistoricoInteressado(List<Integer> historicoInteressado) {
+		this.historicoInteressado = historicoInteressado;
+	}
+	public String getFoto() {
 		return foto;
 	}
-	public void setFoto(byte[] foto) {
+	public void setFoto(String foto) {
 		this.foto = foto;
 	}
 	public Integer getId() {

@@ -1,5 +1,7 @@
 package com.piiv.piiv.entities;
 
+import java.util.List;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,20 +27,34 @@ public class Car {
     @Column(name = "descricao", length = 500)
     private String descricao;
 
-    @Column(name = "foto")
-    private byte[] foto;
+    @Column(name = "foto", columnDefinition = "TEXT")
+    private String foto;
 
     @Column(name = "anoDeFabricacao")
-    private int anoDeFabricacao;
+    private Integer anoDeFabricacao;
+
+    @Column
+    private List<Integer> historicoInteressado;
 
     @Column(name = "anoDoModelo")
-    private int anoDoModelo;
+    private Integer anoDoModelo;
 
     @Column(name = "valor")
-    private double valor;
+    private Double valor;
     
     @Column
     private Integer interessado;
+
+    
+    
+    
+	public List<Integer> getHistoricoInteressado() {
+		return historicoInteressado;
+	}
+
+	public void setHistoricoInteressado(List<Integer> historicoInteressado) {
+		this.historicoInteressado = historicoInteressado;
+	}
 
 	public Integer getId() {
 		return id;
@@ -73,11 +89,11 @@ public class Car {
 	}
 
 	
-	public byte[] getFoto() {
+	public String getFoto() {
 		return foto;
 	}
 
-	public void setFoto(byte[] foto) {
+	public void setFoto(String foto) {
 		this.foto = foto;
 	}
 
