@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CarResponseDto {
+public class CarResponseAdminDto {
     private Integer id;
     private String marca;
     private String modelo;
@@ -21,14 +21,14 @@ public class CarResponseDto {
     private double valor;
     private String foto;
     private Usuario interessado;
-    private List<Integer> historicoInteressado;
+    private List<Usuario> historicoInteressado;
     
     
     
-	public List<Integer> getHistoricoInteressado() {
+	public List<Usuario> getHistoricoInteressado() {
 		return historicoInteressado;
 	}
-	public void setHistoricoInteressado(List<Integer> historicoInteressado) {
+	public void setHistoricoInteressado(List<Usuario> historicoInteressado) {
 		this.historicoInteressado = historicoInteressado;
 	}
 	public String getFoto() {

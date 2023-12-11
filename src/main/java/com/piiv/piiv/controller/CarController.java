@@ -60,17 +60,27 @@ public class CarController {
     }
 
     @GetMapping("/cars/interesse")
-    public ResponseEntity<List<Car>> getAllCarsInterested() {
+    public ResponseEntity<List<CarResponseDto>> getAllCarsInterested() {
     	try {
     		List<Car> cars = carRepository.findByInteressadoNotNull();
-
+    		List<CarResponseDto> carDTO = new ArrayList<CarResponseDto>();
+    
     		cars.forEach(car->{
+    			CarResponseDto carTemp = new CarResponseDto();
     			Usuario userDTO = usuarioRepository.findById(car.getInteressado()).get();
-            	
-    		
+    			carTemp.setInteressado(userDTO);
+    			carTemp.setAnoDeFabricacao(car.getAnoDeFabricacao());
+    			carTemp.setAnoDoModelo(car.getAnoDoModelo());
+    			carTemp.setDescricao(car.getDescricao());
+    			carTemp.setFoto(car.getFoto());
+    			carTemp.setHistoricoInteressado(car.getHistoricoInteressado());
+    			carTemp.setId(car.getId());
+    			carTemp.setMarca(car.getMarca());
+    			carTemp.setModelo(car.getModelo());
+    			carTemp.setValor(car.getValor());
+    			carDTO.add(carTemp);
     		});
-
-    		return new ResponseEntity<>(cars, HttpStatus.OK);
+    	  return new ResponseEntity<>(carDTO, HttpStatus.OK);
     	}catch(Exception e) {
           return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
     	}
@@ -98,6 +108,23 @@ public class CarController {
 	    	System.out.println("error: "+ e.getMessage());
 	        return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 	    }
+    }
+    
+    @PutMapping("/cars/{id}/removeinteresse/{userId}")
+    public ResponseEntity<Car> removeInteresse(@PathVariable("id") Long id, @PathVariable("userId") Integer interessado) {
+    	try {
+    		Car carro = carRepository.findById(id).get();
+    		carro.getInteressado();
+    		if (carro.getInteressado() != null) {
+    			carro.setInteressado(null);
+    		}
+    		
+    		return new ResponseEntity<>(carRepository.save(carro), HttpStatus.OK);
+    	} catch (Exception e) {
+    		System.out.println("error: "+ e.getMessage());
+	        return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+    	}
+    	
     }
     
     @PostMapping("/cars")
